@@ -11,7 +11,17 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 }; 
 
-function generateRandomString() {}
+function generateRandomString(length) { 
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters.charAt(randomIndex);
+  }
+
+  return randomString;
+}
 
 // Routes Below 
 
@@ -25,7 +35,12 @@ app.get("/urls", (req, res) => {
 }); 
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
+  const longURL = req.body.longURL
+  const shortURL= generateRandomString(6)
+  console.log(req.body);
+  console.log(longURL);
+  console.log(shortURL);
+  urlDatabase[shortURL] = longURL 
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
@@ -34,9 +49,29 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const longURL = urlDatabase[req.params.id];
+  const shortURL = req.params.id 
+  const longURL = urlDatabase[shortURL];
+
+  if(!longURL) {
+    res.status(404).send("short URL not found");
+  } else {
+
   const templateVars = { id: req.params.id, longURL };
   res.render("urls_show", templateVars);
+  }
+}); 
+
+app.get("/u/:id", (req, res) => {
+
+  const shortURL = req.params.id 
+  const longURL = urlDatabase[shortURL];
+
+  if(!longURL) {
+    res.status(404).send("short URL not found");
+  } else {
+
+  res.redirect(longURL);
+  }
 });
 
 app.get("/urls.json", (req, res) => {
