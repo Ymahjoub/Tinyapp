@@ -74,6 +74,18 @@ app.get("/u/:id", (req, res) => {
   }
 }); 
 
+app.post("/urls/:id", (req, res) => {
+  const shortURL = req.params.id;
+  const newLongURL = req.body.longURL;
+
+  if (urlDatabase.hasOwnProperty(shortURL)) {
+    urlDatabase[shortURL] = newLongURL;
+    res.redirect("/urls");
+  } else {
+    res.status(404).send("short URL not found")
+  }
+});
+
 app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
 
@@ -84,7 +96,7 @@ app.post("/urls/:id/delete", (req, res) => {
   } else {
     res.status(404).send("short URL not found")
   }
-});
+}); 
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
