@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080 
+const PORT = 8080; 
 
 app.set("view engine", "ejs");
 
@@ -105,6 +105,16 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
+}); 
+
+app.post('/login', (req, res) => {
+  const {username} = req.body; 
+  console.log('username:', username);
+  console.log('Reuqest Body:', req.body); 
+
+  res.cookie('username', username);
+
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
