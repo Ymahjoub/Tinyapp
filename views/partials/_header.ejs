@@ -9,13 +9,14 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <form action="/login" method="POST" class="form-inline">
-          <input type="text" id="username" name="username" required placeholder="Username" class="form-control mr-2">
-          <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-        <% if (locals.username) { %>
-          <p class="nav-item nav-link mt-2">Logged in as: <%= locals.username %>! <!-- Add your Logout button here -->
-          </p>
+        <% if (username) { %>
+          <p class="nav-item nav-link mt-2">Logged in as: <%= username %>! <!-- Add your Logout button here --></p>
+         
+        <% } else{ %>
+          <form action="/login" method="POST" class="form-inline">
+            <input type="text" id="username" name="username" required placeholder="Username" class="form-control mr-2">
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
           <% } %>
       </div>
     </div>

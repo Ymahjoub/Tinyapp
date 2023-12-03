@@ -32,10 +32,10 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
-});
+// app.get("/urls", (req, res) => {
+//   const templateVars = { urls: urlDatabase };
+//   res.render("urls_index", templateVars);
+// });
 
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL
@@ -115,6 +115,7 @@ app.get("/urls", (req, res) => {
     username: req.cookies["username"],
     urls: urlDatabase,
   };
+
   res.render("urls_index", localsVars);
 });
 
