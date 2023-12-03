@@ -32,11 +32,6 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-// app.get("/urls", (req, res) => {
-//   const templateVars = { urls: urlDatabase };
-//   res.render("urls_index", templateVars);
-// });
-
 app.post("/urls", (req, res) => {
   const longURL = req.body.longURL
   const shortURL = generateRandomString(6)
@@ -123,7 +118,12 @@ app.post('/login', (req, res) => {
   const { username } = req.body;
   res.cookie('username', username);
   res.redirect('/urls');
-});
+}); 
+
+app.post('/logout', (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls')
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

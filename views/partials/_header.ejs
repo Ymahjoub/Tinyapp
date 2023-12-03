@@ -10,8 +10,10 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <% if (username) { %>
-          <p class="nav-item nav-link mt-2">Logged in as: <%= username %>! <!-- Add your Logout button here --></p>
-         
+          <p class="nav-item nav-link mt-2">Logged in as: <%= username %>!</p>
+         <form action="/logout" method="POST">
+          <button type="submit" class="btn btn-primary">Logout</button>
+         </form>
         <% } else{ %>
           <form action="/login" method="POST" class="form-inline">
             <input type="text" id="username" name="username" required placeholder="Username" class="form-control mr-2">
