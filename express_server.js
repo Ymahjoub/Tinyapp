@@ -2,6 +2,7 @@ const express = require("express");
 const cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const app = express();
+const { generateRandomString, getUserByEmail, urlsForUser } = require("./helpers")
 
 const PORT = 8080;
 
@@ -16,53 +17,6 @@ app.use(cookieSession({
 const users = {};
 
 const urlDatabase = {};
-
-// Helper function
-function generateRandomString(length) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomString = '';
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    randomString += characters.charAt(randomIndex);
-  }
-
-  return randomString;
-}
-// Helper function 
-function getUserByEmail(email) {
-  //looping over users using for in loop
-  for (let userId in users) {
-    //getting user by ID
-    const user = users[userId]
-    //checking if users email matches
-    if (user.email === email) {
-      //returning users if matching 
-      return user
-    }
-  }
-  // return null if no matching users
-  return null
-};
-
-//Helper function 
-function urlsForUser(id) {
-
-  // new url database 
-  const usersURLDatabase = {};
-
-  // loop over urls database values using for in loop
-  for (let shortURL in urlDatabase) {
-    // checking if shortURL belongs to user with id
-    if (urlDatabase[shortURL].userId === id) {
-
-      // Adding urls that belong to the userId to a new database
-      usersURLDatabase[shortURL] = urlDatabase[shortURL]
-    }
-  };
-  // return statement 
-  return usersURLDatabase
-};
 
 // Routes Below 
 
@@ -221,7 +175,7 @@ app.get("/urls", (req, res) => {
   const user = users[userId];
 
   //getting urls For User
-  const usersURLDatabase = urlsForUser(userId);
+  const usersURLDatabase = urlsForUser(userId, urlDatabase);
 
   const localsVars = {
     user,
@@ -239,7 +193,7 @@ app.get("/urls", (req, res) => {
 app.post('/login', (req, res) => {
   //get email and password from request body
   const { email, password } = req.body;
-  const user = getUserByEmail(email)
+  const user = getUserByEmail(email, users)
   //checking if user exists
   if (!user) {
     //if not return error
@@ -287,7 +241,7 @@ app.post('/register', (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'Email or Password cannot be empty' });
   }
-  const user = getUserByEmail(email)
+  const user = getUserByEmail(email, users)
   // check if the email is already in use 
   if (user) {
     //send back a response with 400 code for same email
