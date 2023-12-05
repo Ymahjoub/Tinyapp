@@ -1,5 +1,6 @@
 const express = require("express");
-const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session')
+const bcrypt = require("bcryptjs");
 const app = express();
 
 const PORT = 8080;
@@ -7,7 +8,10 @@ const PORT = 8080;
 app.set("view engine", "ejs");
 
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['MySecret']
+}));
 
 const users = {};
 
@@ -68,7 +72,7 @@ app.get("/", (req, res) => {
 
 app.post("/urls", (req, res) => {
   // getting userId from the cookie
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   //getting user object
   const user = users[userId];
   if (!user) {
@@ -90,7 +94,7 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   // getting userId from the cookie
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   //getting user object
   const user = users[userId];
 
@@ -112,7 +116,7 @@ app.get("/urls/:id", (req, res) => {
 
 
   // getting userId from the cookie
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   //getting user object
   const user = users[userId];
 
@@ -151,7 +155,7 @@ app.post("/urls/:id", (req, res) => {
   const newLongURL = req.body.longURL;
 
   // getting userId from the cookie
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   //getting user object
   const user = users[userId];
 
@@ -176,7 +180,7 @@ app.post("/urls/:id/delete", (req, res) => {
   const shortURL = req.params.id;
 
   // getting userId from the cookie
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   //getting user object
   const user = users[userId];
 
@@ -212,7 +216,7 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
 
   // getting userId from the cookie
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   //getting user object
   const user = users[userId];
 
@@ -242,24 +246,24 @@ app.post('/login', (req, res) => {
     return res.status(403).json({ error: 'user does not exist' })
   };
   //checking if passwords match
-  if (user.password !== password) {
+  if (!bcrypt.compareSync(password, user.password)) {
     //if not return error
     return res.status(403).json({ error: 'incorrect password' })
   };
   // set cookie to user_id
-  res.cookie('user_id', user.id);
+  req.session.user_id = user.id;
   //redirecting to urls page
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/login')
 });
 
 app.get("/register", (req, res) => {
   // getting userId from the cookie
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   //getting user object
   const user = users[userId];
 
@@ -276,7 +280,7 @@ app.get("/register", (req, res) => {
 
 app.post('/register', (req, res) => {
   const { email, password } = req.body;
-
+  const hashedPassword = bcrypt.hashSync(password, 10);
   console.log(users)
 
   // return 400 if email or password are empty 
@@ -296,14 +300,14 @@ app.post('/register', (req, res) => {
   const newUser = {
     id: userId,
     email: email,
-    password: password
+    password: hashedPassword
   };
 
   // add the new user to the global users object
   users[userId] = newUser;
 
   // set the user_id cookie
-  res.cookie('user_id', userId);
+  req.session.user_id = userId;
 
   //redirect to the /urls page
   res.redirect('/urls');
@@ -314,7 +318,7 @@ app.post('/register', (req, res) => {
 
 app.get("/login", (req, res) => {
   // getting userId from the cookie
-  const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   //getting user object
   const user = users[userId];
 
